@@ -1,0 +1,110 @@
+:root {
+            /* Light Mode Variables */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --accent-color: #16a34a;
+            --accent-text: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --card-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .dark {
+            /* Dark Mode Variables */
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --accent-color: #22c55e;
+            --accent-text: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+            --card-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-color { border-color: var(--border-color); }
+        .accent { background-color: var(--accent-color); }
+        .accent-text { color: var(--accent-text); }
+        .accent-hover:hover { background-color: var(--accent-color); opacity: 0.9; }
+        .card-shadow { box-shadow: var(--card-shadow); }
+        .card-shadow-hover:hover { box-shadow: var(--card-shadow-hover); }
+
+        .turf-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .turf-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sport-icon {
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .sport-icon:hover, .sport-icon.active {
+            border-color: var(--accent-color);
+            background-color: var(--accent-color);
+            color: var(--accent-text);
+        }
+        .sport-icon.active {
+             box-shadow: 0 0 15px rgba(22, 163, 74, 0.4);
+        }
+        
+        /* Theme Toggle Switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .theme-switch {
+            display: inline-block;
+            height: 24px;
+            position: relative;
+            width: 50px;
+        }
+        .theme-switch input {
+            display:none;
+        }
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+        }
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 16px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 16px;
+        }
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }

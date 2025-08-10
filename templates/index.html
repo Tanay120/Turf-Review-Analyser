@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackathonTurf - Book Your Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="">
+
+    <header class="bg-primary shadow-md sticky top-0 z-40 border-b border-color">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-2xl font-extrabold text-primary">Hackathon<span class="text-green-600">Turf</span></a>
+
+                <div class="hidden lg:flex flex-grow justify-center mx-8">
+                    <div class="relative w-full max-w-lg">
+                        <input type="text" placeholder="Search by name, location..." class="w-full bg-secondary text-primary border border-color rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-secondary"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="theme-switch-wrapper">
+                        <i class="fas fa-sun mr-2 text-secondary"></i>
+                        <label class="theme-switch" for="theme-toggle">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <i class="fas fa-moon ml-2 text-secondary"></i>
+                    </div>
+                    <a href="#" class="hidden md:block text-secondary hover:text-primary font-medium">My Bookings</a>
+                    <button class="accent accent-text font-bold py-2 px-5 rounded-full accent-hover">Login</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6 text-center text-primary">Choose Your Sport</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                <button class="sport-icon active flex flex-col items-center p-4 rounded-lg bg-primary">
+                    <i class="fas fa-futbol fa-2x mb-2"></i>
+                    <span class="font-semibold">Football</span>
+                </button>
+                <button class="sport-icon flex flex-col items-center p-4 rounded-lg bg-primary">
+                    <i class="fas fa-baseball-ball fa-2x mb-2"></i>
+                    <span class="font-semibold">Cricket</span>
+                </button>
+                <button class="sport-icon flex flex-col items-center p-4 rounded-lg bg-primary">
+                    <i class="fas fa-table-tennis fa-2x mb-2"></i>
+                    <span class="font-semibold">Tennis</span>
+                </button>
+                <button class="sport-icon flex flex-col items-center p-4 rounded-lg bg-primary">
+                    <i class="fas fa-basketball-ball fa-2x mb-2"></i>
+                    <span class="font-semibold">Basketball</span>
+                </button>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-primary">Top Rated Turfs</h3>
+                <select class="bg-primary border border-color rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-secondary">
+                    <option>Sort by: Recommended</option>
+                    <option>Sort by: Price</option>
+                    <option>Sort by: Rating</option>
+                </select>
+            </div>
+
+            <div id="turf-listings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-primary mt-12 border-t border-color">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center text-secondary">
+                <p>&copy; 2025 HackathonTurf. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="review-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-primary rounded-lg p-8 card-shadow w-full max-w-md">
+            <h3 id="modal-title" class="text-2xl font-bold text-primary text-center mb-4">Leave a Review for...</h3>
+            <textarea id="review-text-input" class="w-full bg-secondary text-primary border border-color rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500" rows="4" placeholder="e.g., 'The field was fantastic and clean.'"></textarea>
+            <div class="flex justify-end gap-4 mt-4">
+                <button id="modal-close-btn" class="font-bold py-2 px-6 rounded-full hover:bg-secondary">Cancel</button>
+                <button id="modal-submit-btn" class="accent accent-text font-bold py-2 px-6 rounded-full accent-hover">Submit</button>
+            </div>
+            <div id="modal-result-display" class="mt-4 text-center text-lg font-semibold h-6"></div>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA ---
+        // Using relative paths that will work with our Flask setup
+        const turfs = [
+            {
+                id: 1,
+                name: "Greenfield Arena",
+                location: "Andheri, Mumbai",
+                price: 1800,
+                rating: 0,
+                reviews: 0,
+                image: "images/footballturf.png"
+            },
+            {
+                id: 2,
+                name: "The Wicket",
+                location: "Juhu, Mumbai",
+                price: 2000,
+                rating: 0,
+                reviews: 0,
+                image: "images/cricketturf.png"
+            },
+            {
+                id: 3,
+                name: "Ace Courts",
+                location: "Bandra, Mumbai",
+                price: 1500,
+                rating: 0,
+                reviews: 0,
+                image: "images/tenniscourt.png"
+            },
+            {
+                id: 4,
+                name: "The All-Rounder",
+                location: "Malad, Mumbai",
+                price: 2500,
+                rating: 0,
+                reviews: 0,
+                image: "images/basketballcourt.png"
+            }
+        ];
+
+        // --- ELEMENTS ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const turfListingsContainer = document.getElementById('turf-listings');
+        const modal = document.getElementById('review-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalSubmitBtn = document.getElementById('modal-submit-btn');
+        const reviewTextInput = document.getElementById('review-text-input');
+        const modalResultDisplay = document.getElementById('modal-result-display');
+
+        let activeTurfId = null;
+
+        // --- FUNCTIONS ---
+        const createStarRating = (rating) => {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            for(let i = 0; i < fullStars; i++) stars += '<i class="fas fa-star"></i>';
+            if(halfStar) stars += '<i class="fas fa-star-half-alt"></i>';
+            for(let i = 0; i < emptyStars; i++) stars += '<i class="far fa-star"></i>';
+            return stars;
+        };
+
+        const renderTurfs = () => {
+            turfListingsContainer.innerHTML = '';
+            turfs.forEach(turf => {
+                const starHTML = createStarRating(turf.rating);
+                const reviewText = turf.reviews === 0 ? "(No reviews)" : `(${turf.reviews} reviews)`;
+                
+                // CORRECTED IMAGE PATH: We use a static base path that Flask understands
+                const imagePath = `{{ url_for('static', filename='') }}${turf.image}`;
+
+                const cardHTML = `
+                    <div class="turf-card bg-primary rounded-lg overflow-hidden card-shadow card-shadow-hover flex flex-col">
+                        <img src="${imagePath}" alt="${turf.name}" class="w-full h-48 object-cover">
+                        <div class="p-5 flex-grow flex flex-col">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-xl font-bold text-primary">${turf.name}</h4>
+                                <span class="text-sm font-bold text-green-500 bg-green-100 dark:bg-green-900/50 dark:text-green-400 px-3 py-1 rounded-full whitespace-nowrap">${turf.rating.toFixed(1)} ★</span>
+                            </div>
+                            <p class="text-secondary mb-4 flex items-center text-sm"><i class="fas fa-map-marker-alt mr-2"></i>${turf.location}</p>
+                            <div class="flex items-center mb-4 text-yellow-400">
+                                ${starHTML}
+                                <span class="text-secondary ml-2 text-xs">${reviewText}</span>
+                            </div>
+                            <div class="mt-auto flex justify-between items-center gap-2">
+                                <p class="text-lg font-bold text-primary">₹${turf.price}<span class="text-sm font-normal text-secondary">/hr</span></p>
+                                <div class="flex gap-2">
+                                    <button class="book-btn border border-green-600 text-green-600 font-bold py-2 px-4 rounded-lg text-sm hover:bg-green-600 hover:text-white transition-colors" data-turf-id="${turf.id}">Book</button>
+                                    <button class="review-btn accent accent-text font-bold py-2 px-4 rounded-lg text-sm accent-hover" data-turf-id="${turf.id}">Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                turfListingsContainer.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        };
+
+        const openModal = (turfId) => {
+            activeTurfId = turfId;
+            const turf = turfs.find(t => t.id === turfId);
+            modalTitle.textContent = `Leave a Review for ${turf.name}`;
+            reviewTextInput.value = '';
+            modalResultDisplay.textContent = '';
+            modal.classList.remove('hidden');
+        };
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            activeTurfId = null;
+        };
+
+        const handleSubmitReview = () => {
+            const reviewText = reviewTextInput.value;
+            if (reviewText.trim() === '' || !activeTurfId) return;
+            modalResultDisplay.textContent = 'Analyzing...';
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ review: reviewText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const newRating = parseInt(data.sentiment.charAt(0));
+                if (isNaN(newRating)) { throw new Error("Invalid rating from server."); }
+                
+                const turf = turfs.find(t => t.id === activeTurfId);
+                const totalRatingPoints = turf.rating * turf.reviews;
+                turf.reviews++;
+                turf.rating = (totalRatingPoints + newRating) / turf.reviews;
+
+                modalResultDisplay.textContent = `Prediction: ${data.sentiment}`;
+                setTimeout(() => {
+                    renderTurfs();
+                    closeModal();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                modalResultDisplay.textContent = 'Error analyzing review.';
+            });
+        };
+
+        // --- EVENT LISTENERS ---
+        const setTheme = (isDark) => {
+            body.classList.toggle('dark', isDark);
+            themeToggle.checked = isDark;
+        };
+        const savedTheme = localStorage.getItem('theme');
+        setTheme(savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+        themeToggle.addEventListener('change', () => {
+            const isDark = themeToggle.checked;
+            setTheme(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        const sportIcons = document.querySelectorAll('.sport-icon');
+        sportIcons.forEach(icon => {
+            icon.addEventListener('click', () => {
+                sportIcons.forEach(i => i.classList.remove('active'));
+                icon.classList.add('active');
+            });
+        });
+
+        turfListingsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('review-btn')) {
+                const turfId = parseInt(e.target.dataset.turfId);
+                openModal(turfId);
+            }
+            if (e.target.classList.contains('book-btn')) {
+                const turfId = parseInt(e.target.dataset.turfId);
+                const turf = turfs.find(t => t.id === turfId);
+                alert(`Booking feature for "${turf.name}" is not implemented yet!`);
+            }
+        });
+
+        modalSubmitBtn.addEventListener('click', handleSubmitReview);
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if(e.target.id === 'review-modal') closeModal();
+        });
+
+        // --- INITIAL RENDER ---
+        renderTurfs();
+    });
+    </script>
+
+</body>
+</html>
